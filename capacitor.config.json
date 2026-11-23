@@ -1,0 +1,3 @@
+{"appId":"com.firoozeh.admin","appName":"پنل مدیریت املاک","webDir":"www",
+"plugins":{"CapacitorHttp":{"enabled":false}},
+"server":{"androidScheme":"https"}}
