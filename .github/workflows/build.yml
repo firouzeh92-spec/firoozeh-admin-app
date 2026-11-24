@@ -15,7 +15,11 @@ jobs:
       - run: npm install
       - run: npx cap add android
       - name: Icons
-        run: npx capacitor-assets generate --android
+        run: |
+          RES=android/app/src/main/res
+          rm -rf $RES/mipmap-anydpi-v26 $RES/mipmap-*/ic_launcher*.png
+          cp -r icons/* $RES/
+          ls $RES/mipmap-xxxhdpi
       - run: npx cap sync android
       - name: Build signed release
         working-directory: android
