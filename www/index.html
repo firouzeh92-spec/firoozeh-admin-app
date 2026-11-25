@@ -1211,6 +1211,23 @@ function openVoice() {
 function stopRec() { if (REC) { try { REC.stop(); } catch (e) {} REC = null; } var b = $('#recbtn'); if (b) { b.classList.remove('on'); b.textContent = '🎤 میکروفون برنامه'; } }
 ACT.rec = function () {
   if (REC) { stopRec(); return; }
+  var NSR = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform() && window.Capacitor.Plugins && window.Capacitor.Plugins.SpeechRecognition;
+  if (NSR) {
+    (async function () {
+      try {
+        var pm = await NSR.checkPermissions();
+        if (!pm || pm.speechRecognition !== 'granted') pm = await NSR.requestPermissions();
+        if (!pm || pm.speechRecognition !== 'granted') { toast('اجازه‌ی میکروفون داده نشد', true); return; }
+        var res = await NSR.start({ language: 'fa-IR', maxResults: 1, popup: true, partialResults: false });
+        var t = res && res.matches && res.matches[0];
+        if (t) { var el = $('#vtext'); if (el) el.value = (el.value ? el.value + ' ' : '') + t; }
+      } catch (err) {
+        var m = String((err && (err.message || err)) || '');
+        if (!/cancel|0|no match|didn/i.test(m)) toast('تشخیص صدا انجام نشد — از میکروفون کیبورد استفاده کن', true);
+      }
+    })();
+    return;
+  }
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { toast('این مرورگر تشخیص صدا ندارد؛ از میکروفون کیبورد استفاده کن', true); return; }
   var base = $('#vtext').value, rec = new SR();
